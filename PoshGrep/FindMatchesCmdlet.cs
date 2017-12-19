@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.PowerShell.Commands;
 
@@ -31,9 +32,20 @@ namespace PoshGrep
 
         private SearchOption GetFileSearchOption() => Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
+        private CancellationToken _cancellationToken;
+        private CancellationTokenSource _cancellationTokenSource;
+
+        protected override void StopProcessing()
+        {
+            _cancellationTokenSource.Cancel();
+            base.StopProcessing();
+        }
+
         protected override void BeginProcessing()
         {
             _pattern = new Regex(GetPattern(), RegexOptions.Compiled);
+            _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationToken = _cancellationTokenSource.Token;
             WriteDebug($"Pattern: {Pattern}");
             WriteDebug($"Recursive: {Recursive}");
             WriteDebug($"IgnoreCase: {IgnoreCase}");
@@ -58,6 +70,10 @@ namespace PoshGrep
                 var lineNumber = 1;
                 foreach (var line in lines)
                 {
+                    if (_cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
                     if (_pattern.IsMatch(line))
                     {
                         Write($"{ConvertToRelative(Path.GetFullPath(filePath))}:{lineNumber}\t");
@@ -78,6 +94,10 @@ namespace PoshGrep
             var index = 0;
             while (index < lineContent.Length)
             {
+                if (_cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
                 var match = _pattern.Match(lineContent, index);
                 if (match.Success && match.Length > 0)
                 {

@@ -1,6 +1,6 @@
 ﻿@{
     RootModule = 'PoshGrep.dll'
-    ModuleVersion = '1.0.0.0'
+    ModuleVersion = '1.0.1.0'
     CmdletsToExport = 'Find-Matches'
     GUID = '42632d30-fe90-4e61-ba81-9c20353ffd73'
     DotNetFrameworkVersion = '4.0.0'
