@@ -12,4 +12,6 @@ Served via [PowerShell Gallery](https://www.powershellgallery.com/packages/PoshG
 
 The names of the parameter are chosen to reflect some of the parameters that the original grep has.
 
+This means that the parameter names start with a unique character, so that `-IgnoreCase` can also be written as `-i`
+
 ![Alias](docs/Alias.png)
