@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.PowerShell.Commands;
 
 namespace PoshGrep
 {
@@ -58,6 +55,10 @@ namespace PoshGrep
             var files = Directory.GetFiles(SessionState.Path.CurrentLocation.Path, Filter, GetFileSearchOption());
             foreach (var file in files)
             {
+                if (_cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
                 FindMatchesInFile(file);
             }
         }
